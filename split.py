@@ -236,6 +236,10 @@ if __name__ == "__main__":
                 chapter_list = load_chapters(args.input, f)
                 for chapter in chapter_list:
                     chapters[chapter.start] = chapter
+
+        # ZZZ init chapter starting value
+        chapter = 0   # TODO support override by command args
+
         with open(out_fname, "w") as f:
             for group in silences:
                 f.write("CHAPTER\n")
@@ -247,6 +251,15 @@ if __name__ == "__main__":
                     name = chapters[group.start].name
                 f.write("NAME: {}\n".format(name))
                 f.write("START: {}\n".format(group.start))
+
+                # ZZZ convert seconds into hh:mm:ss format
+                abs_seconds = int(group.start)
+                seconds = int(abs_seconds % 60)
+                minutes = int(((abs_seconds - seconds) / 60) % 60)
+                hours = int(((abs_seconds - seconds) / 60) / 60)
+                f.write(f'Chapter {chapter} --- {hours:02d}:{minutes:02d}:{seconds:02d}\n')  # noqa
+                chapter += 1
+
                 for silence in group.silences:
                     f.write("{} ... {}\n".format(silence.start, silence.end))
                 f.write("END\n\n")
